@@ -1,16 +1,29 @@
 {
-  "name": "poketab---alpha",
+  "name": "xebec-server",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "Light weight ExpressJS alternative",
   "type": "module",
+  "main": "xebec.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cd test && node test.js",
+    "build": "npx tsc"
   },
-  "keywords": [],
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itsfuad/XebecServer.git"
+  },
+  "keywords": [
+    "expressjs",
+    "server",
+    "nodejs"
+  ],
+  "author": "Fuad Hasan",
   "license": "ISC",
-  "devDependencies": {
+  "bugs": {
+    "url": "https://github.com/itsfuad/XebecServer/issues"
+  },
+  "homepage": "https://github.com/itsfuad/XebecServer#readme",
+  "dependencies": {
     "@types/node": "^20.6.0"
   }
 }
