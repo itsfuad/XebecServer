@@ -1,6 +1,9 @@
 import http from 'http';
 import url from 'url';
+import path from 'path';
+import ejs from 'ejs';
 import { getBoundary, parse } from './utils/formParser.js';
+let __dirname;
 class Xebec {
     routes;
     middleware;
@@ -21,6 +24,9 @@ class Xebec {
             Xebec.instance = new Xebec();
         }
         return Xebec.instance;
+    }
+    setViewsDirectory(dirname) {
+        __dirname = dirname;
     }
     get(path, ...handlers) {
         this.registerRoute('GET', path, handlers);
@@ -75,6 +81,7 @@ class Xebec {
             return;
         }
         res.send = this.send.bind(this, res);
+        res.render = this.render.bind(this, res);
         for (const routePath in methodRoutes) {
             const routeHandler = methodRoutes[routePath];
             const regexPattern = this.getRouteRegex(routePath);
@@ -88,8 +95,29 @@ class Xebec {
         }
     }
     send(res, body, statusCode = 200) {
-        res.writeHead(statusCode, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(body));
+        try {
+            res.writeHead(statusCode);
+            res.end(body);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
+    render(res, view, data) {
+        console.log('Rendering view:', view);
+        //render the ejs file
+        //read the file
+        //use ejs to render the template
+        ejs.renderFile(path.join(__dirname, 'views', view), data, (err, str) => {
+            if (err) {
+                console.error(err);
+                res.writeHead(500);
+                res.end('Internal Server Error');
+                return;
+            }
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(str);
+        });
     }
     handleUnsupportedContentType(res) {
         res.writeHead(415, { 'Content-Type': 'text/plain' });

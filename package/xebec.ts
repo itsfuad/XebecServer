@@ -1,7 +1,14 @@
 import http from 'http';
 import url from 'url';
 import { ParsedUrlQuery } from 'querystring';
+import fs from 'fs';
+import path from 'path';
+import ejs from 'ejs';
+
 import { getBoundary, parse } from './utils/formParser.js';
+
+
+let __dirname: string;
 
 // Define a custom request type/interface
 interface HttpRequest extends http.IncomingMessage {
@@ -15,7 +22,7 @@ interface HttpRequest extends http.IncomingMessage {
 
 interface HttpResponse extends http.ServerResponse {
     send?: (body: any, statusCode?: number) => void;
-    status?: (code: number) => { send: (body: any) => void };
+    render?: (view: string, data: Record<string, any>) => void;
 }
 
 interface formFile {
@@ -46,6 +53,10 @@ class Xebec {
             Xebec.instance = new Xebec();
         }
         return Xebec.instance;
+    }
+
+    setViewsDirectory(dirname: string) {
+        __dirname = dirname;
     }
 
     get(path: string, ...handlers: ((req: HttpRequest, res: http.ServerResponse, next: ()=>{}) => void)[]) {
@@ -119,6 +130,7 @@ class Xebec {
         }
 
         res.send = this.send.bind(this, res);
+        res.render = this.render.bind(this, res);
     
         for (const routePath in methodRoutes) {
             const routeHandler = methodRoutes[routePath];
@@ -136,8 +148,30 @@ class Xebec {
     }
 
     send(res: http.ServerResponse, body: any, statusCode = 200) {
-        res.writeHead(statusCode, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(body));
+        try {
+            res.writeHead(statusCode);
+            res.end(body);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    render(res: http.ServerResponse, view: string, data: Record<string, any>) {
+        console.log('Rendering view:', view);
+        //render the ejs file
+        //read the file
+        
+        //use ejs to render the template
+        ejs.renderFile(path.join(__dirname, 'views', view), data, (err, str) => {
+            if (err) {
+                console.error(err);
+                res.writeHead(500);
+                res.end('Internal Server Error');
+                return;
+            }
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(str);
+        });
     }
 
 
@@ -166,8 +200,6 @@ class Xebec {
             return { ...params, [key]: value };
         }, {} as Record<string, string>);
     }
-    
-    
 
     listen(port: number, callback: () => void) {
         this.server.listen(port, callback);
