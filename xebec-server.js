@@ -82,6 +82,9 @@ class Xebec {
         }
         res.send = this.send.bind(this, res);
         res.render = this.render.bind(this, res);
+        res.setCookie = this.setCookie.bind(this, res);
+        res.clearCookie = this.clearCookie.bind(this, res);
+        req.cookies = this.parseQueryString(req.headers.cookie || '');
         for (const routePath in methodRoutes) {
             const routeHandler = methodRoutes[routePath];
             const regexPattern = this.getRouteRegex(routePath);
@@ -93,6 +96,47 @@ class Xebec {
                 return; // Stop searching for routes
             }
         }
+    }
+    setCookie(res, name, value, options = {}) {
+        let cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
+        if (options.maxAge) {
+            cookie += `; Max-Age=${options.maxAge}`;
+        }
+        if (options.domain) {
+            cookie += `; Domain=${options.domain}`;
+        }
+        if (options.path) {
+            cookie += `; Path=${options.path}`;
+        }
+        if (options.expires) {
+            cookie += `; Expires=${options.expires.toUTCString()}`;
+        }
+        if (options.httpOnly) {
+            cookie += `; HttpOnly`;
+        }
+        if (options.secure) {
+            cookie += `; Secure`;
+        }
+        res.setHeader('Set-Cookie', cookie);
+    }
+    clearCookie(res, name, options = {}) {
+        let cookie = `${encodeURIComponent(name)}=; Max-Age=0`;
+        if (options.domain) {
+            cookie += `; Domain=${options.domain}`;
+        }
+        if (options.path) {
+            cookie += `; Path=${options.path}`;
+        }
+        if (options.expires) {
+            cookie += `; Expires=${options.expires.toUTCString()}`;
+        }
+        if (options.httpOnly) {
+            cookie += `; HttpOnly`;
+        }
+        if (options.secure) {
+            cookie += `; Secure`;
+        }
+        res.setHeader('Set-Cookie', cookie);
     }
     send(res, body, statusCode = 200) {
         try {

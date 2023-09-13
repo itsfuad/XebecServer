@@ -22,6 +22,8 @@ interface HttpRequest extends http.IncomingMessage {
 interface HttpResponse extends http.ServerResponse {
     send?: (body: any, statusCode?: number) => void;
     render?: (view: string, data: Record<string, any>) => void;
+    setCookie?: (name: string, value: string, options?: CookieOptions) => void;
+    clearCookie?: (name: string, options?: CookieOptions) => void;
 }
 
 interface formFile {
@@ -29,6 +31,15 @@ interface formFile {
     type: string;
     data: Buffer;
     size: number;
+}
+
+interface CookieOptions {
+    maxAge?: number;
+    domain?: string;
+    path?: string;
+    expires?: Date;
+    httpOnly?: boolean;
+    secure?: boolean;
 }
 
 class Xebec {
@@ -58,12 +69,12 @@ class Xebec {
         __dirname = dirname;
     }
 
-    get(path: string, ...handlers: ((req: HttpRequest, res: http.ServerResponse, next: ()=>{}) => void)[]) {
+    get(path: string, ...handlers: ((req: HttpRequest, res: HttpResponse, next: ()=>{}) => void)[]) {
         this.registerRoute('GET', path, handlers);
     }
 
     //post method
-    post(path: string, ...handlers: ((req: HttpRequest, res: http.ServerResponse, next: ()=>{}) => void)[]) {
+    post(path: string, ...handlers: ((req: HttpRequest, res: HttpResponse, next: ()=>{}) => void)[]) {
         this.registerRoute('POST', path, handlers);
     }
 
@@ -130,6 +141,11 @@ class Xebec {
 
         res.send = this.send.bind(this, res);
         res.render = this.render.bind(this, res);
+
+        res.setCookie = this.setCookie.bind(this, res);
+        res.clearCookie = this.clearCookie.bind(this, res);
+
+        req.cookies = this.parseQueryString(req.headers.cookie || '');
     
         for (const routePath in methodRoutes) {
             const routeHandler = methodRoutes[routePath];
@@ -145,6 +161,52 @@ class Xebec {
             }
         }
     }
+
+    
+    setCookie(res: HttpResponse, name: string, value: string, options: CookieOptions = {}) {
+        let cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
+        
+        if (options.maxAge) {
+            cookie += `; Max-Age=${options.maxAge}`;
+        }
+        if (options.domain) {
+            cookie += `; Domain=${options.domain}`;
+        }
+        if (options.path) {
+            cookie += `; Path=${options.path}`;
+        }
+        if (options.expires) {
+            cookie += `; Expires=${options.expires.toUTCString()}`;
+        }
+        if (options.httpOnly) {
+            cookie += `; HttpOnly`;
+        }
+        if (options.secure) {
+            cookie += `; Secure`;
+        }
+        res.setHeader('Set-Cookie', cookie);
+    }
+
+    clearCookie(res: HttpResponse, name: string, options: CookieOptions = {}) {
+        let cookie = `${encodeURIComponent(name)}=; Max-Age=0`;
+        if (options.domain) {
+            cookie += `; Domain=${options.domain}`;
+        }
+        if (options.path) {
+            cookie += `; Path=${options.path}`;
+        }
+        if (options.expires) {
+            cookie += `; Expires=${options.expires.toUTCString()}`;
+        }
+        if (options.httpOnly) {
+            cookie += `; HttpOnly`;
+        }
+        if (options.secure) {
+            cookie += `; Secure`;
+        }
+        res.setHeader('Set-Cookie', cookie);
+    }
+    
 
     send(res: http.ServerResponse, body: any, statusCode = 200) {
         try {

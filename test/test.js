@@ -22,7 +22,8 @@ server.get("/test", (req, res) => {
     const cookies = req.headers.cookie;
     console.log(cookies);
     //set cookies
-    res.setHeader("Set-Cookie", "name=John");
+    res.setCookie('name', 'Fuad', { httpOnly: true, maxAge: 3600 });
+    //res.clearCookie('name');
     res.send("Hello World!");
 });
 
