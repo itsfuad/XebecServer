@@ -1,7 +1,6 @@
 import http from 'http';
 import url from 'url';
 import { ParsedUrlQuery } from 'querystring';
-import fs from 'fs';
 import path from 'path';
 import ejs from 'ejs';
 
