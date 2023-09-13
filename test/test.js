@@ -1,4 +1,4 @@
-import { XebecServer } from "../package/xebec.js";
+import { XebecServer } from "./../xebec-server.js";
 
 const server = XebecServer();
 

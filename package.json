@@ -1,9 +1,9 @@
 {
   "name": "xebec-server",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "Light weight ExpressJS alternative",
   "type": "module",
-  "main": "xebec.js",
+  "main": "xebec-server.js",
   "scripts": {
     "test": "node test/test.js",
     "build": "npx tsc",
