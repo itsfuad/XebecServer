@@ -29,10 +29,12 @@ class Xebec {
         __dirname = dirname;
     }
     get(path, ...handlers) {
+        //console.log('GET', path);
         this.registerRoute('GET', path, handlers);
     }
     //post method
     post(path, ...handlers) {
+        //console.log('POST', path);
         this.registerRoute('POST', path, handlers);
     }
     use(middleware) {
@@ -80,10 +82,12 @@ class Xebec {
             this.handleNotFound(res);
             return;
         }
+        //console.log('Request:', req.method, req.url);
         res.send = this.send.bind(this, res);
         res.render = this.render.bind(this, res);
         res.setCookie = this.setCookie.bind(this, res);
         res.clearCookie = this.clearCookie.bind(this, res);
+        res.status = this.status.bind(this, res);
         req.cookies = this.parseQueryString(req.headers.cookie || '');
         for (const routePath in methodRoutes) {
             const routeHandler = methodRoutes[routePath];
@@ -96,6 +100,11 @@ class Xebec {
                 return; // Stop searching for routes
             }
         }
+    }
+    status(res, statusCode) {
+        res.statusCode = statusCode;
+        console.log('Status:', statusCode);
+        return res;
     }
     setCookie(res, name, value, options = {}) {
         let cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
@@ -140,11 +149,13 @@ class Xebec {
     }
     send(res, body, statusCode = 200) {
         try {
-            res.writeHead(statusCode);
+            res.writeHead(res.statusCode);
             res.end(body);
         }
         catch (error) {
             console.error(error);
+            res.writeHead(500);
+            res.end('Internal Server Error');
         }
     }
     render(res, view, data) {

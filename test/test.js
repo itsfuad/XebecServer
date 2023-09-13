@@ -14,11 +14,14 @@ const data = {
 };
 
 server.get("/", (req, res) => {
-    res.send("Default route");
+    console.log('Request received: /');
+    res.statusCode = 404;
+    res.status(200).send("Hello World!");
 });
 
 server.get("/test", (req, res) => {
     //get cookies
+    console.log('Request received: /test');
     const cookies = req.headers.cookie;
     console.log(cookies);
     //set cookies
@@ -39,6 +42,6 @@ server.get('/testArray', (req, res) => {
     res.send(JSON.stringify(testArray));
 });
 
-server.listen(3000, () => {
+server.listen(3001, () => {
     console.log("Server started on port 3000");
 });

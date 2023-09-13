@@ -24,6 +24,7 @@ interface HttpResponse extends http.ServerResponse {
     render?: (view: string, data: Record<string, any>) => void;
     setCookie?: (name: string, value: string, options?: CookieOptions) => void;
     clearCookie?: (name: string, options?: CookieOptions) => void;
+    status?: (statusCode: number) => void;
 }
 
 interface formFile {
@@ -70,11 +71,13 @@ class Xebec {
     }
 
     get(path: string, ...handlers: ((req: HttpRequest, res: HttpResponse, next: ()=>{}) => void)[]) {
+        //console.log('GET', path);
         this.registerRoute('GET', path, handlers);
     }
 
     //post method
     post(path: string, ...handlers: ((req: HttpRequest, res: HttpResponse, next: ()=>{}) => void)[]) {
+        //console.log('POST', path);
         this.registerRoute('POST', path, handlers);
     }
 
@@ -139,11 +142,15 @@ class Xebec {
             return;
         }
 
+        //console.log('Request:', req.method, req.url);
+
         res.send = this.send.bind(this, res);
         res.render = this.render.bind(this, res);
 
         res.setCookie = this.setCookie.bind(this, res);
         res.clearCookie = this.clearCookie.bind(this, res);
+
+        res.status = this.status.bind(this, res);
 
         req.cookies = this.parseQueryString(req.headers.cookie || '');
     
@@ -160,6 +167,13 @@ class Xebec {
                 return; // Stop searching for routes
             }
         }
+    }
+
+
+    status(res: HttpResponse, statusCode: number) {
+        res.statusCode = statusCode;
+        console.log('Status:', statusCode);
+        return res;
     }
 
     
@@ -210,10 +224,12 @@ class Xebec {
 
     send(res: http.ServerResponse, body: any, statusCode = 200) {
         try {
-            res.writeHead(statusCode);
+            res.writeHead(res.statusCode);
             res.end(body);
         } catch (error) {
             console.error(error);
+            res.writeHead(500);
+            res.end('Internal Server Error');
         }
     }
 
