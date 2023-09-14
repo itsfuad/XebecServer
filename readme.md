@@ -5,6 +5,7 @@ Use it when you need a small server. This codebase is way more smaller than expr
 ## Use
 ```js
 import { XebecServer } from "xebec-server";
+import { setMaxFileSize, formParser } from "pika-form-parser";
 
 const server = XebecServer();
 
@@ -20,16 +21,32 @@ const data = {
 };
 
 server.get("/", (req, res) => {
-    res.send("Default route");
+    console.log('Request received: /');
+    res.statusCode = 404;
+    res.status(200).send("Hello World!");
 });
 
 server.get("/test", (req, res) => {
     //get cookies
+    console.log('Request received: /test');
     const cookies = req.headers.cookie;
     console.log(cookies);
     //set cookies
-    res.setHeader("Set-Cookie", "name=John");
+    res.setCookie('name', 'Fuad', { httpOnly: true, maxAge: 3600 });
+    //res.clearCookie('name');
     res.send("Hello World!");
+});
+
+setMaxFileSize(1000000); // 1MB
+
+server.post('/upload', formParser, (req, res) => {
+
+    console.log('Request received: /upload');
+
+    console.log(req.body);
+    console.log(req.files);
+
+    res.send('Upload received');
 });
 
 server.get("/test/:id", (req, res) => {
