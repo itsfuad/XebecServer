@@ -1,4 +1,5 @@
 import { XebecServer } from "./../xebec-server.js";
+import { setMaxFileSize, formParser } from "pika-form-parser";
 
 const server = XebecServer();
 
@@ -30,6 +31,18 @@ server.get("/test", (req, res) => {
     res.send("Hello World!");
 });
 
+setMaxFileSize(1000000); // 1MB
+
+server.post('/upload', formParser, (req, res) => {
+
+    console.log('Request received: /upload');
+
+    console.log(req.body);
+    console.log(req.files);
+
+    res.send('Upload received');
+});
+
 server.get("/test/:id", (req, res) => {
     res.send(`Hello ${req.params.id}!`);
 });
@@ -42,6 +55,6 @@ server.get('/testArray', (req, res) => {
     res.send(JSON.stringify(testArray));
 });
 
-server.listen(3001, () => {
+server.listen(3000, () => {
     console.log("Server started on port 3000");
 });
