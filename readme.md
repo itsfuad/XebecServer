@@ -44,7 +44,20 @@ server.post('/upload', formParser, (req, res) => {
     console.log('Request received: /upload');
 
     console.log(req.body);
-    console.log(req.files);
+    /*
+     Should output:
+        {
+        fields: { age: '22' },
+        files: [
+                {
+                filename: '373339577_265286506327738_9175574451157144857_n.jpg',
+                type: 'image/jpeg',
+                name: 'File',
+                data: <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 ... 50461 more bytes>   
+                }
+            ]
+        }
+     */
 
     res.send('Upload received');
 });
