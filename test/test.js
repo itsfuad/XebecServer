@@ -38,7 +38,6 @@ server.post('/upload', formParser, (req, res) => {
     console.log('Request received: /upload');
 
     console.log(req.body);
-    console.log(req.files);
 
     res.send('Upload received');
 });
