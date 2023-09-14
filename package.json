@@ -1,6 +1,6 @@
 {
   "name": "xebec-server",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Light weight ExpressJS alternative",
   "type": "module",
   "main": "xebec-server.js",
@@ -24,7 +24,7 @@
     "url": "https://github.com/itsfuad/XebecServer/issues"
   },
   "homepage": "https://github.com/itsfuad/XebecServer#readme",
-  "dependencies": {
+  "devDependencies": {
     "@types/ejs": "^3.1.2",
     "@types/node": "^20.6.0",
     "ejs": "^3.1.9"
