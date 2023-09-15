@@ -1,5 +1,5 @@
 import { XebecServer } from "./../xebec-server.js";
-import { setMaxFileSize, formParser } from "pika-form-parser";
+import { setMaxFileSize, readForm } from "multipart-form-reader";
 
 const server = XebecServer();
 
@@ -33,7 +33,7 @@ server.get("/test", (req, res) => {
 
 setMaxFileSize(1000000); // 1MB
 
-server.post('/upload', formParser, (req, res) => {
+server.post('/upload', readForm, (req, res) => {
 
     console.log('Request received: /upload');
 

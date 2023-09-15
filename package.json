@@ -30,6 +30,6 @@
     "ejs": "^3.1.9"
   },
   "dependencies": {
-    "pika-form-parser": "^1.0.0"
+    "multipart-form-reader": "^1.0.0"
   }
 }
