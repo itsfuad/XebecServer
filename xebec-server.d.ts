@@ -11,9 +11,8 @@ interface HttpRequest extends http.IncomingMessage {
     method?: string;
     cookies?: Record<string, string>;
 }
-interface HttpResponse extends http.ServerResponse {
-    send?: (body: any, statusCode?: number) => void;
-    render?: (view: string, data: Record<string, any>) => void;
+export interface HttpResponse extends http.ServerResponse {
+    send: (body: any, statusCode?: number) => void;
     setCookie?: (name: string, value: string, options?: CookieOptions) => void;
     clearCookie?: (name: string, options?: CookieOptions) => void;
     status?: (statusCode: number) => void;
@@ -42,22 +41,22 @@ declare class Xebec {
     setViewsDirectory(dirname: string): void;
     get(path: string, ...handlers: ((req: HttpRequest, res: HttpResponse, next: () => {}) => void)[]): void;
     post(path: string, ...handlers: ((req: HttpRequest, res: HttpResponse, next: () => {}) => void)[]): void;
-    use(middleware: (req: HttpRequest, res: http.ServerResponse, next: () => {}) => void): void;
+    use(middleware: (req: HttpRequest, res: HttpResponse, next: () => {}) => void): void;
     parseQueryString(queryString: string): Record<string, string>;
-    registerRoute(method: string, path: string, handlers: ((req: HttpRequest, res: http.ServerResponse, next: () => {}) => void)[]): void;
-    composeMiddleware(middlewares: ((req: HttpRequest, res: http.ServerResponse, next: any) => void)[], routeHandler: (req: HttpRequest, res: http.ServerResponse, next: any) => void): (req: HttpRequest, res: http.ServerResponse) => void;
+    registerRoute(method: string, path: string, handlers: ((req: HttpRequest, res: HttpResponse, next: () => {}) => void)[]): void;
+    composeMiddleware(middlewares: ((req: HttpRequest, res: HttpResponse, next: any) => void)[], routeHandler: (req: HttpRequest, res: HttpResponse, next: any) => void): (req: HttpRequest, res: HttpResponse) => void;
     handleRequest(req: HttpRequest, res: HttpResponse): Promise<void>;
     status(res: HttpResponse, statusCode: number): HttpResponse;
     setCookie(res: HttpResponse, name: string, value: string, options?: CookieOptions): void;
     clearCookie(res: HttpResponse, name: string, options?: CookieOptions): void;
-    send(res: http.ServerResponse, body: any, statusCode?: number): void;
-    handleUnsupportedContentType(res: http.ServerResponse): void;
+    send(res: HttpResponse, body: any, statusCode?: number): void;
+    handleUnsupportedContentType(res: HttpResponse): void;
     handleNotFound(res: HttpResponse): void;
     getRouteRegex(routePath: string): RegExp;
     extractRouteParams(routePath: string, match: RegExpMatchArray): Record<string, string>;
     listen(port: number, callback: () => void): void;
 }
 export declare function XebecServer(): Xebec;
-export declare function parseMutipartForm(req: HttpRequest, res: http.ServerResponse, next: () => void): void;
+export declare function parseMutipartForm(req: HttpRequest, res: HttpResponse, next: () => void): void;
 export declare function setMaxFileSize(size: number): void;
 export {};

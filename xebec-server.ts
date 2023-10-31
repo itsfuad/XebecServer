@@ -16,9 +16,8 @@ interface HttpRequest extends http.IncomingMessage {
     cookies?: Record<string, string>;
 }
 
-interface HttpResponse extends http.ServerResponse {
-    send?: (body: any, statusCode?: number) => void;
-    render?: (view: string, data: Record<string, any>) => void;
+export interface HttpResponse extends http.ServerResponse {
+    send: (body: any, statusCode?: number) => void;
     setCookie?: (name: string, value: string, options?: CookieOptions) => void;
     clearCookie?: (name: string, options?: CookieOptions) => void;
     status?: (statusCode: number) => void;
@@ -52,7 +51,7 @@ class Xebec {
         };
         this.middleware = [];
         this.server = http.createServer((req, res) => {
-            this.handleRequest(req, res);
+            this.handleRequest(req, res as HttpResponse);
         });
     }
 
@@ -78,7 +77,7 @@ class Xebec {
         this.registerRoute('POST', path, handlers);
     }
 
-    use(middleware: (req: HttpRequest, res: http.ServerResponse, next: ()=>{}) => void) {
+    use(middleware: (req: HttpRequest, res: HttpResponse, next: ()=>{}) => void) {
         this.middleware.push(middleware);
     }
 
@@ -101,7 +100,7 @@ class Xebec {
     }
     
 
-    registerRoute(method: string, path: string, handlers: ((req: HttpRequest, res: http.ServerResponse, next: ()=>{}) => void)[]) {
+    registerRoute(method: string, path: string, handlers: ((req: HttpRequest, res: HttpResponse, next: ()=>{}) => void)[]) {
         const middlewares = handlers.filter((handler) => typeof handler === 'function');
         const routeHandler = middlewares.pop() || (() => { });
     
@@ -110,9 +109,9 @@ class Xebec {
     
 
     composeMiddleware(
-        middlewares: ((req: HttpRequest, res: http.ServerResponse, next: any) => void)[],
-        routeHandler: (req: HttpRequest, res: http.ServerResponse, next: any) => void,
-    ): (req: HttpRequest, res: http.ServerResponse) => void {
+        middlewares: ((req: HttpRequest, res: HttpResponse, next: any) => void)[],
+        routeHandler: (req: HttpRequest, res: HttpResponse, next: any) => void,
+    ): (req: HttpRequest, res: HttpResponse) => void {
         return async (req, res) => {
             const executeMiddleware = async (index: number) => {
                 if (index < middlewares.length) {
@@ -218,7 +217,7 @@ class Xebec {
     }
     
 
-    send(res: http.ServerResponse, body: any, statusCode = 200) {
+    send(res: HttpResponse, body: any, statusCode = 200) {
         try {
             res.writeHead(res.statusCode);
             res.end(body);
@@ -229,7 +228,7 @@ class Xebec {
         }
     }
 
-    handleUnsupportedContentType(res: http.ServerResponse) {
+    handleUnsupportedContentType(res: HttpResponse) {
         res.writeHead(415, { 'Content-Type': 'text/plain' });
         res.end('Unsupported Media Type');
     }
@@ -264,7 +263,7 @@ export function XebecServer(): Xebec{
     return Xebec.getInstance();
 }
 
-export function parseMutipartForm(req: HttpRequest, res: http.ServerResponse, next: () => void) {
+export function parseMutipartForm(req: HttpRequest, res: HttpResponse, next: () => void) {
     //console.log('Parsing multipart form data');
 
     if (!req.headers['content-type'] || !req.headers['content-type'].startsWith('multipart/form-data')) {
