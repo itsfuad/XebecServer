@@ -1,11 +1,7 @@
 import http from 'http';
 import url from 'url';
-import path from 'path';
-import ejs from 'ejs';
-
+import { getBoundary, parse } from './utils/formParser.js';
 let __dirname;
-
-
 class Xebec {
     routes;
     middleware;
@@ -86,7 +82,6 @@ class Xebec {
         }
         //console.log('Request:', req.method, req.url);
         res.send = this.send.bind(this, res);
-        res.render = this.render.bind(this, res);
         res.setCookie = this.setCookie.bind(this, res);
         res.clearCookie = this.clearCookie.bind(this, res);
         res.status = this.status.bind(this, res);
@@ -160,22 +155,6 @@ class Xebec {
             res.end('Internal Server Error');
         }
     }
-    render(res, view, data) {
-        console.log('Rendering view:', view);
-        //render the ejs file
-        //read the file
-        //use ejs to render the template
-        ejs.renderFile(path.join(__dirname, 'views', view), data, (err, str) => {
-            if (err) {
-                console.error(err);
-                res.writeHead(500);
-                res.end('Internal Server Error');
-                return;
-            }
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(str);
-        });
-    }
     handleUnsupportedContentType(res) {
         res.writeHead(415, { 'Content-Type': 'text/plain' });
         res.end('Unsupported Media Type');
@@ -202,7 +181,57 @@ class Xebec {
         this.server.listen(port, callback);
     }
 }
-
 export function XebecServer() {
     return Xebec.getInstance();
+}
+export function parseMutipartForm(req, res, next) {
+    //console.log('Parsing multipart form data');
+    if (!req.headers['content-type'] || !req.headers['content-type'].startsWith('multipart/form-data')) {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('Bad Request');
+        return;
+    }
+    if (req.headers['content-length'] && Number(req.headers['content-length']) > maxFileSize) {
+        res.writeHead(413, { 'Content-Type': 'text/plain' });
+        res.end('Request Entity Too Large');
+        return;
+    }
+    const boundary = getBoundary(req.headers['content-type']);
+    if (!boundary) {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('Bad Request');
+        return;
+    }
+    //console.log('Boundary:', boundary);
+    let chunks = [];
+    req.on('data', (chunk) => {
+        chunks.push(chunk);
+    });
+    req.on('end', () => {
+        const body = Buffer.concat(chunks);
+        const formData = parse(body, boundary);
+        //console.log('Parts:', formData);
+        formData.forEach((part) => {
+            if (part['filename']) {
+                //console.log('File:', part);
+                req.files = req.files || [];
+                req.files.push({
+                    filename: part.filename,
+                    type: part.type,
+                    data: part.data,
+                    size: part.data.length,
+                });
+            }
+            else {
+                //console.log('Field:', part);
+                req.body = req.body || {};
+                part.name && (req.body[part.name] = part.data.toString());
+            }
+        });
+        next();
+    });
+}
+let maxFileSize = 1024 * 1024 * 100; //100MB
+export function setMaxFileSize(size) {
+    maxFileSize = size;
 }

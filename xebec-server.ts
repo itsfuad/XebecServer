@@ -1,9 +1,6 @@
 import http from 'http';
 import url from 'url';
 import { ParsedUrlQuery } from 'querystring';
-import path from 'path';
-import ejs from 'ejs';
-
 import { getBoundary, parse } from './utils/formParser.js';
 
 
@@ -145,7 +142,6 @@ class Xebec {
         //console.log('Request:', req.method, req.url);
 
         res.send = this.send.bind(this, res);
-        res.render = this.render.bind(this, res);
 
         res.setCookie = this.setCookie.bind(this, res);
         res.clearCookie = this.clearCookie.bind(this, res);
@@ -232,25 +228,6 @@ class Xebec {
             res.end('Internal Server Error');
         }
     }
-
-    render(res: http.ServerResponse, view: string, data: Record<string, any>) {
-        console.log('Rendering view:', view);
-        //render the ejs file
-        //read the file
-        
-        //use ejs to render the template
-        ejs.renderFile(path.join(__dirname, 'views', view), data, (err, str) => {
-            if (err) {
-                console.error(err);
-                res.writeHead(500);
-                res.end('Internal Server Error');
-                return;
-            }
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(str);
-        });
-    }
-
 
     handleUnsupportedContentType(res: http.ServerResponse) {
         res.writeHead(415, { 'Content-Type': 'text/plain' });
