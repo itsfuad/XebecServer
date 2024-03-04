@@ -4,6 +4,11 @@
   "description": "Light weight ExpressJS alternative",
   "type": "module",
   "main": "xebec-server.js",
+  "engines": {
+    "node": ">=16.13.0",
+    "pnpm": ">=3",
+    "npm": ">=8"
+  },
   "scripts": {
     "test": "node test/test.js",
     "build": "npx tsc",
