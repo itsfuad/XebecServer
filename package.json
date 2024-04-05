@@ -1,10 +1,13 @@
 {
-  "name": "xebec-server",
+  "name": "@itsfuad/xebec-server",
   "version": "2.0.2",
   "description": "Light weight ExpressJS alternative",
   "type": "module",
   "main": "xebec-server.js",
   "schema": "https://schemastore.org/package",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@itsfuad"
+  },
   "engines": {
     "node": ">=16.13.0",
     "pnpm": ">=3",
@@ -31,6 +34,7 @@
   },
   "homepage": "https://github.com/itsfuad/XebecServer#readme",
   "devDependencies": {
+    "typescript": "^4.5.4",
     "@types/ejs": "^3.1.2",
     "@types/node": "^20.6.0",
     "ejs": "^3.1.9"
