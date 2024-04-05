@@ -5,9 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  multipart-form-reader:
-    specifier: ^1.0.0
-    version: 1.0.0
+  '@itsfuad/multipart-form-reader':
+    specifier: 1.0.1
+    version: 1.0.1
 
 devDependencies:
   '@types/ejs':
@@ -19,8 +19,16 @@ devDependencies:
   ejs:
     specifier: ^3.1.9
     version: 3.1.9
+  typescript:
+    specifier: ^4.5.4
+    version: 4.9.5
 
 packages:
+
+  /@itsfuad/multipart-form-reader@1.0.1:
+    resolution: {integrity: sha512-cUu4n7+zkl7+CPBuK6dMXVH4cO3Z8riYtuov69OwRBGQFBY4I18ih0SKg5Vlx1Ospe+etoPW0FBgbCkqE1XWZQ==, tarball: https://npm.pkg.github.com/download/@itsfuad/multipart-form-reader/1.0.1/b8e5e3c0fc246175ed098abfd4e52676d12a9e0b}
+    engines: {node: '>=16.13.0', npm: '>=8', pnpm: '>=3'}
+    dev: false
 
   /@types/ejs@3.1.5:
     resolution: {integrity: sha512-nv+GSx77ZtXiJzwKdsASqi+YQ5Z7vwHsTP0JY2SiQgjGckkBRKZnk8nIM+7oUZ1VCtuTz0+By4qVR7fqzp/Dfg==}
@@ -126,15 +134,17 @@ packages:
       brace-expansion: 2.0.1
     dev: true
 
-  /multipart-form-reader@1.0.0:
-    resolution: {integrity: sha512-H94dFtL+thVdAmDTTXSMC6wktAA3Ln/D5wxcl0QNRsAoJ/Rq7B0BdvlYuRQrvyuxM/UiCpOZqHuMi/r6oeC0eQ==}
-    dev: false
-
   /supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
     dependencies:
       has-flag: 4.0.0
+    dev: true
+
+  /typescript@4.9.5:
+    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
     dev: true
 
   /undici-types@5.26.5:

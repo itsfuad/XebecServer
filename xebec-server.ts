@@ -1,7 +1,7 @@
 import http from 'http';
 import url from 'url';
 import { ParsedUrlQuery } from 'querystring';
-import { getBoundary, parse } from './utils/formParser.js';
+import { getBoundary, parse } from '@itsfuad/multipart-form-reader';
 
 
 let __dirname: string;
