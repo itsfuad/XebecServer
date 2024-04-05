@@ -5,9 +5,6 @@
   "type": "module",
   "main": "xebec-server.js",
   "schema": "https://schemastore.org/package",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@itsfuad"
-  },
   "engines": {
     "node": ">=16.13.0",
     "pnpm": ">=3",
