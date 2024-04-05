@@ -1,6 +1,6 @@
 {
   "name": "@itsfuad/xebec-server",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Light weight ExpressJS alternative",
   "type": "module",
   "main": "xebec-server.js",
