@@ -42,7 +42,7 @@ interface CookieOptions {
 class Xebec {
     private routes: any;
     private middleware: any;
-    private server: http.Server;
+    public server: http.Server;
     private static instance: Xebec | null = null;
     constructor() {
         this.routes = {
