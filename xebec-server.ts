@@ -116,14 +116,14 @@ class Xebec {
         middlewares: ((req: HttpRequest, res: HttpResponse, next: any) => void)[],
         routeHandler: (req: HttpRequest, res: HttpResponse, next: any) => void,
     ): (req: HttpRequest, res: HttpResponse) => void {
-        return async (req, res) => {
+        return (req, res) => {
             const executeMiddleware = async (index: number) => {
                 if (index < middlewares.length) {
                     const middleware = middlewares[index];
-                    await middleware(req, res, () => executeMiddleware(index + 1));
+                    middleware(req, res, () => executeMiddleware(index + 1));
                 } else {
                     // All middlewares have executed, call the route handler
-                    routeHandler(req, res, () => { });
+                    routeHandler(req, res, () => { }); // Empty next function for route handlers
                 }
             };
     
