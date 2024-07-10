@@ -11,7 +11,7 @@ interface HttpRequest extends http.IncomingMessage {
     params?: Record<string, string>;
     query?: ParsedUrlQuery;
     body?: Record<string, any>;
-    files?: formFile[];
+    files?: FormFile[];
     method?: string;
     cookies?: Record<string, string>;
 }
@@ -23,7 +23,7 @@ export interface HttpResponse extends http.ServerResponse {
     status?: (statusCode: number) => void;
 }
 
-interface formFile {
+interface FormFile {
     filename: string;
     type: string;
     data: Buffer;
@@ -71,13 +71,11 @@ class Xebec {
     }
 
     get(path: string, ...handlers: ((req: HttpRequest, res: HttpResponse, next: ()=>{}) => void)[]) {
-        //console.log('GET', path);
         this.registerRoute('GET', path, handlers);
     }
 
     //post method
     post(path: string, ...handlers: ((req: HttpRequest, res: HttpResponse, next: ()=>{}) => void)[]) {
-        //console.log('POST', path);
         this.registerRoute('POST', path, handlers);
     }
 
@@ -106,7 +104,7 @@ class Xebec {
 
     registerRoute(method: string, path: string, handlers: ((req: HttpRequest, res: HttpResponse, next: ()=>{}) => void)[]) {
         const middlewares = handlers.filter((handler) => typeof handler === 'function');
-        const routeHandler = middlewares.pop() || (() => { });
+        const routeHandler = middlewares.pop() ?? (() => { });
     
         this.routes[method][path] = this.composeMiddleware([...this.middleware, ...middlewares], routeHandler);
     }
@@ -141,8 +139,6 @@ class Xebec {
             this.handleNotFound(res);
             return;
         }
-
-        //console.log('Request:', req.method, req.url);
 
         res.send = this.send.bind(this, res);
 
@@ -250,7 +246,7 @@ class Xebec {
     }
 
     extractRouteParams(routePath: string, match: RegExpMatchArray): Record<string, string> {
-        const paramNames = routePath.match(/:[^\s/]+/g) || [] as string[];
+        const paramNames = routePath.match(/:[^\s/]+/g) ?? [] as string[];
         return paramNames.reduce((params: Record<string, string>, paramName: string, index: number) => {
             const key = paramName.substring(1);
             const value = match[index + 1];
@@ -268,9 +264,8 @@ export function XebecServer(): Xebec{
 }
 
 export function parseMutipartForm(req: HttpRequest, res: HttpResponse, next: () => void) {
-    //console.log('Parsing multipart form data');
 
-    if (!req.headers['content-type'] || !req.headers['content-type'].startsWith('multipart/form-data')) {
+    if (!req.headers['content-type']?.startsWith('multipart/form-data')) {
         res.writeHead(400, { 'Content-Type': 'text/plain' });
         res.end('Bad Request');
         return;
@@ -290,7 +285,6 @@ export function parseMutipartForm(req: HttpRequest, res: HttpResponse, next: () 
         return;
     }
     
-    //console.log('Boundary:', boundary);
 
     let chunks: Buffer[] = [];
 
@@ -301,11 +295,9 @@ export function parseMutipartForm(req: HttpRequest, res: HttpResponse, next: () 
     req.on('end', () => {
         const body = Buffer.concat(chunks);
         const formData = parse(body, boundary);
-        //console.log('Parts:', formData);
         formData.forEach((part) => {
             if (part['filename']) {
-                //console.log('File:', part);
-                req.files = req.files || [];
+                req.files = req.files ?? [];
                 req.files.push({
                     filename: part.filename,
                     type: part.type,
@@ -313,8 +305,7 @@ export function parseMutipartForm(req: HttpRequest, res: HttpResponse, next: () 
                     size: part.data.length,
                 });
             } else {
-                //console.log('Field:', part);
-                req.body = req.body || {};
+                req.body = req.body ?? {};
                 part.name && (req.body[part.name] = part.data.toString());
             }
         });
